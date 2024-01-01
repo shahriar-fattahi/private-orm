@@ -5,7 +5,7 @@ from .manager import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=20, unique=True)
+    username = models.CharField(max_length=100, unique=True)
     first_name = models.CharField(max_length=20, blank=True)
     last_name = models.CharField(max_length=20, blank=True)
 
