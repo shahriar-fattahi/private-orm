@@ -22,5 +22,5 @@ class RestaurantFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Restaurant
 
-    class Param:
+    class Params:
         uid = Faker().random_number(digits=3)
