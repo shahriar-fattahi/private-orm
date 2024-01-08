@@ -1,0 +1,26 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+</head>
+
+<body>
+    {% for restaurant in restaurants %}
+    <p>{{restaurant.name}}</p>
+    <ul>
+        {% for rate in restaurant.ratings.all %}
+            <li>
+                <p>{{rate.rating}}</p>
+            </li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+
+    {% for rate in rates %}
+        <p>{{rate.restaurant.name}} - {{rate.rating}}</p>
+    {% endfor %}
+</body>
+
+</html>

@@ -14,8 +14,16 @@ class TimeStamp(models.Model):
 class Restaurant(models.Model):
     class Meta:
         db_table = "restaurants"
-        ordering = [
-            "name",
+        ordering = [models.functions.Lower("name")]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(latitude__lte=90, latitude__gte=-90),
+                name="latitude_range",
+            ),
+            models.CheckConstraint(
+                check=models.Q(longitude__lte=180, longitude__gte=-180),
+                name="longitude_range",
+            ),
         ]
 
     class RestaurantType(models.TextChoices):
@@ -33,13 +41,25 @@ class Restaurant(models.Model):
     date_opened = models.DateField(
         db_comment="Date when the restaurant was opened",
     )
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    latitude = models.FloatField(
+        validators=[
+            validators.MinValueValidator(-90),
+            validators.MaxValueValidator(90),
+        ]
+    )
+    longitude = models.FloatField(
+        validators=[
+            validators.MinValueValidator(-180),
+            validators.MaxValueValidator(180),
+        ]
+    )
     restaurant_type = models.CharField(
         max_length=2,
         choices=RestaurantType.choices,
         default=RestaurantType.PERSIAN,
     )
+
+    capacity = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self) -> str:
         return self.name
@@ -56,7 +76,9 @@ class Rating(TimeStamp):
         ]
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(
+        Restaurant, on_delete=models.CASCADE, related_name="ratings"
+    )
     rating = models.PositiveIntegerField(validators=[validators.MaxValueValidator(5)])
 
     def __str__(self):
@@ -68,5 +90,6 @@ class Sale(TimeStamp):
         Restaurant,
         on_delete=models.SET_NULL,
         null=True,
+        related_name="sales",
     )
     income = models.DecimalField(max_digits=8, decimal_places=2)
